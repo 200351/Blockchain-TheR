@@ -1,0 +1,7 @@
+library(igraph)
+dfBlockchain <- read.csv2("blockchain1M.csv", sep=" ", header = F)
+gGraph <- graph.data.frame(dfBlockchain, F)
+plot(gGraph, layout = layout.fruchterman.reingold, vertex.label=NA, vertex.size=1)
+diameter(gGraph)
+hist(betweenness(gGraph), breaks = 20)
+clusters(gGraph)
