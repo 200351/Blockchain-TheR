@@ -60,9 +60,29 @@ avgPathLength = t(avgPathLength)
 avgDegree = t(avgDegree)
 avgBetweeness = t(avgBetweeness)
 
-# diameterPlot <- plot_ly(diameterResult)
-# avgPathLengthPlot <- plot_ly(avgPathLength)
-# avgDegreePlot <- plot_ly(avgDegree)
-# avgBetweenessPlot <- plot_ly(avgBetweeness)
 
+number_ticks <- function(n) {function(limits) pretty(limits, n)}
+
+library(reshape2)
+diameterResultCorr <- melt(diameterResult,na.rm = TRUE)
+# Heatmap
+library(ggplot2)
+diameterResultMap <- ggplot(data = diameterResultCorr, aes(Var2, Var1, fill = value))+
+  geom_tile(color = "orange")+
+  scale_fill_gradient2(low = "white", high = "red", mid = "orange", 
+                       midpoint = 25, limit = c(0,50), space = "Lab", 
+                       name="Probka/Transakcja") +
+  theme_minimal()+
+  coord_fixed() +
+  scale_x_continuous(breaks=number_ticks(10)) +
+  scale_y_continuous(breaks=number_ticks(10))
+
+diameterResultMap + geom_text(aes(Var2, Var1, label = value), color = "black", size = 2) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y =  element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank())
 
