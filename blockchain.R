@@ -1,7 +1,13 @@
+setwd("D:/PWR/mgr/PracaMagisterska/R")
 library(igraph)
-dfBlockchain <- read.csv2("blockchain1M.csv", sep=" ", header = F)
+dfBlockchain <- read.csv2("test/blockchain10k.csv", sep=" ", header = F)
 gGraph <- graph.data.frame(dfBlockchain, F)
 plot(gGraph, layout = layout.fruchterman.reingold, vertex.label=NA, vertex.size=1)
 diameter(gGraph)
-hist(betweenness(gGraph), breaks = 20)
+bit <- betweenness(gGraph)
+x <- bit[, "B", drop=FALSE]
+bit;
+average.path.length(gGraph)
+hist(bit, breaks = 10, xlim=range(bit))
 clusters(gGraph)
+de <- degree(gGraph)

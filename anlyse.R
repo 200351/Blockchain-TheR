@@ -2,87 +2,61 @@
 setwd("D:/PWR/mgr/PracaMagisterska/R")
 library(igraph)
 library(gtools)
-
-pathTime = '/time'
-pathCoins = '/coins'
-pathFull = '/full'
-pathBase = 'data/100000/Sample_'
-separator = ""
+source('functions.R')
 
 filecount <- 10
 sampleCount <- 10
-diameterResult <- matrix(nrow = sampleCount, ncol = filecount)
-avgPathLength <- matrix(nrow = sampleCount, ncol = filecount)
-avgDegree <- matrix(nrow = sampleCount, ncol = filecount)
-avgBetweeness <- matrix(nrow = sampleCount, ncol = filecount)
-filenames <- matrix(nrow = sampleCount, ncol = filecount)
 sampleIndex <- 1
-while (sampleIndex < sampleCount + 1) {
-  pathToFiles <- paste(pathBase, sampleIndex - 1, pathCoins, sep = separator)
-  cat('Start analyse of sample ', pathToFiles, sep = separator)
-  cat('\n')
 
-  filenamesTemp <- list.files(pathToFiles, pattern="*.csv", all.files = TRUE,
-                                 full.names = TRUE, recursive = FALSE,
-                                 ignore.case = TRUE)
-  
-  details = file.info(filenamesTemp)
-  details = details[with(details, order(as.POSIXct(mtime))), ]
-  filenamesTemp = rownames(details)
-  filenamesTemp = filenamesTemp[1:10]
-  cat(length(filenamesTemp), ' files found',sep = separator)
-  cat('\n')
-  
+diameterMatrix <- prepareDiagonalMatrix(sampleCount)
+avgPathLengthMatrix <- prepareDiagonalMatrix(sampleCount)
+avgDegreeMatrix <- prepareDiagonalMatrix(sampleCount)
+avgBetweenessMatrix <- prepareDiagonalMatrix(sampleCount)
+filenamesMatrix <- prepareDiagonalMatrix(sampleCount)
+
+while (sampleIndex < sampleCount + 1) {
+  # prepare Path
+  path <- getCoinsPath(sampleIndex - 1)
+  # read ten filenames
+  filenames <- readFilesNames(path, filecount)
+  # prepare index for reverse order
   tableIndex = sampleCount - sampleIndex + 1
-  # for each in filenames
-  for(i in 1:length(filenamesTemp)){
-    filename = filenamesTemp[i]
-    filenames[tableIndex, i] = filename;
-    cat('Analyse of file ', filename, sep=separator)
+  # for each filenames in reverse order for sample
+  for(i in 1:length(filenames)){
+    cat('Analyse of file ',  filenames[i], sep=getSeparator())
     cat('\n')
-    file <- read.csv2(filename, sep=" ", header = F)
-    gGraph <- graph.data.frame(file, F)
-    diameterResult[tableIndex, i] <- diameter(gGraph)
-    avgPathLength[tableIndex, i] <- average.path.length(gGraph)
-    avgDegree[tableIndex, i] <- mean(degree(gGraph))
-    avgBetweeness[tableIndex, i] <- mean(betweenness(gGraph))
-    rm(file)
+    
+    #prepare Graph
+    gGraph <- graph.data.frame(readFile(filenames[i]), F)
+    #save filename in Matrix
+    filenamesMatrix[tableIndex, i] <-  filenames[i];
+    # count diameter and save in Matrix
+    diameterMatrix[tableIndex, i] <- diameter(gGraph)
+    #count average path length and save in Matrix
+    avgPathLengthMatrix[tableIndex, i] <- average.path.length(gGraph)
+    #count average degree and save in Matrix
+    avgDegreeMatrix[tableIndex, i] <- mean(degree(gGraph))
+    #count average betweenness and save in Matrix
+    avgBetweenessMatrix[tableIndex, i] <- mean(betweenness(gGraph))
+    # remove graph
     rm(gGraph)
-    rm(filename)
   }
+  
+  #increase sampleIndex
   sampleIndex <- sampleIndex + 1
-  rm(filenamesTemp)
+  rm(filenames)
 }
 
-filenames = t(filenames)
-diameterResult = t(diameterResult)
-avgPathLength = t(avgPathLength)
-avgDegree = t(avgDegree)
-avgBetweeness = t(avgBetweeness)
+# prepare matrixes transapositions
+filenamesMatrix = t(filenamesMatrix)
+diameterMatrix = t(diameterMatrix)
+avgPathLengthMatrix = t(avgPathLengthMatrix)
+avgDegreeMatrix = t(avgDegreeMatrix)
+avgBetweenessMatrix = t(avgBetweenessMatrix)
 
-
-number_ticks <- function(n) {function(limits) pretty(limits, n)}
-
-library(reshape2)
-diameterResultCorr <- melt(diameterResult,na.rm = TRUE)
-# Heatmap
-library(ggplot2)
-diameterResultMap <- ggplot(data = diameterResultCorr, aes(Var2, Var1, fill = value))+
-  geom_tile(color = "orange")+
-  scale_fill_gradient2(low = "white", high = "red", mid = "orange", 
-                       midpoint = 25, limit = c(0,50), space = "Lab", 
-                       name="Probka/Transakcja") +
-  theme_minimal()+
-  coord_fixed() +
-  scale_x_continuous(breaks=number_ticks(10)) +
-  scale_y_continuous(breaks=number_ticks(10))
-
-diameterResultMap + geom_text(aes(Var2, Var1, label = value), color = "black", size = 2) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y =  element_blank(),
-    panel.grid.major = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_blank(),
-    axis.ticks = element_blank())
-
+#saveToFile
+writeToFile('filenames.csv', filenamesMatrix)
+writeToFile('diameter.csv', diameterMatrix)
+writeToFile('avgPathLength.csv', avgPathLengthMatrix)
+writeToFile('avgDegree.csv', avgDegreeMatrix)
+writeToFile('avgBetweeness.csv', avgBetweenessMatrix)
