@@ -61,17 +61,22 @@ readFile <- function(filename) {
 
 readResultFile <- function(filename) {
   matrix <- read.csv2(paste(pathResult, filename, sep = separator), dec = ".", 
-                      sep=" ", header = F, stringsAsFactors=FALSE,
-                      na.strings='0', as.is=T)
+                      sep=" ", header = F, stringsAsFactors=FALSE, as.is=T)
   rownames(matrix) <- paste('T', 1:10, sep = getSeparator())
   colnames(matrix) <- c("2015-03-31", "2015-06-30","2015-09-30","2015-12-31","2016-03-31","2016-06-30","2016-09-30",'2016-12-31','2017-03-31','2017-06-30')
   matrix <- as.matrix(matrix)
-  for(i in 1:10){
-    matrix[,i] <- as.numeric(format(round(matrix[,i], 2), nsmall = 2))
-  }
+  matrix <- specifDecimal(matrix)
   return(matrix)  
 }
 
+specifDecimal <- function(matrix) {
+  for(i in 1:ncol(matrix)){
+    for(j in 1:nrow(matrix)){
+      if (!is.na(matrix[j,i])) matrix[j,i]  <- as.numeric(format(round(matrix[j,i], 2), nsmall = 2))
+    }
+  }
+  return(matrix)
+}
 
 writeToFile <- function(filename, toWrite) {
   setwd("D:/PWR/mgr/PracaMagisterska/R")
@@ -86,13 +91,16 @@ number_ticks <- function(n) {function(limits) pretty(limits, n)}
 
 prepareHeatMapForMatrix <- function(matrix, name) {
   library(reshape2)
-  matrixCorr <- melt(matrix, na.rm = TRUE)
+  matrixCorr <- melt(matrix, na.rm = FALSE)
   matrixCorr[,3] <- as.numeric(matrixCorr[,3]) 
-  matrixCorr <- na.omit(matrixCorr)
+  for (j in 1:length(matrixCorr[,3])) {
+    if (is.infinite(matrixCorr[j,3])) matrixCorr[j,3] <- NA
+  }
   # Heatmap
+  valuesWithoutNAandInf <- na.omit(matrixCorr[,3])
   library(ggplot2)
-  maxInMatrix <- max(matrixCorr[,3])
-  minInMatrix <- min(matrixCorr[,3])
+  maxInMatrix <- max(valuesWithoutNAandInf)
+  minInMatrix <- min(valuesWithoutNAandInf)
   midPoint <- ((as.numeric(maxInMatrix) - as.numeric(minInMatrix)) / 2)
   heatMap <- ggplot(data = matrixCorr, aes(Var2, Var1, fill = value))+
     geom_tile(color = "orange") +
@@ -103,7 +111,7 @@ prepareHeatMapForMatrix <- function(matrix, name) {
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
                                      size = 10, hjust = 1)) +
     coord_fixed() + 
-    geom_text(aes(Var2, Var1, label = value), color = "black", size = 2) +
+    geom_text(aes(Var2, Var1, label = value), color = "black", size = 2.5) +
     theme(
       axis.title.x = element_blank(),
       axis.title.y =  element_blank(),
@@ -114,4 +122,20 @@ prepareHeatMapForMatrix <- function(matrix, name) {
   return(heatMap)
 }
 
+prepareColumnsMeans <- function(matrix) {
+  return(colMeans(matrix, na.rm = TRUE))
+}
+
+prepareColumnsMeans <- function(matrix) {
+  row <- matrix(colMeans(matrix, na.rm = TRUE))
+  row <- specifDecimal(row)
+  rownames(row) <- c("2015-03-31", "2015-06-30","2015-09-30","2015-12-31","2016-03-31","2016-06-30","2016-09-30",'2016-12-31','2017-03-31','2017-06-30')
+  return(row)
+}
+
+removeBottomTicks <- function(heatMap) {
+  return(heatMap + theme(axis.title.x=element_blank(),
+                         axis.text.x=element_blank(),
+                         axis.ticks.x=element_blank())) 
+}
 
