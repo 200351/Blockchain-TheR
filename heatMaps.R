@@ -1,11 +1,24 @@
 setwd("D:/PWR/mgr/PracaMagisterska/R")
 source('functions.R')
 
-filenamesMatrix = readResultFile('filenames.csv')
-diameterMatrix = readResultFile('diameter.csv')
-avgPathLengthMatrix = readResultFile('avgPathLength.csv')
+filenamesMatrix <- readResultFile('filenames.csv')
+
+#Graph metrics
+diameterMatrix <- readResultFile('diameter.csv')
+avgPathLengthMatrix <- readResultFile('avgPathLength.csv')
 avgDegreeMatrix = readResultFile('avgDegree.csv')
 avgBetweenessMatrix = readResultFile('avgBetweeness.csv')
+
+#Blockchain metrics
+avgTransactionMatrix 
+writeToFile('avgTransactionValue.csv', avgTransactionValue)
+writeToFile('avgTransactionPeriod.csv', avgTransactionPeriod)
+writeToFile('boundaryDiff.csv', boundaryDiff)
+writeToFile('countOfBlocks.csv', countOfBlocks)
+
+
+
+
 
 diameterMatrix
 diameterHeatMap <- prepareHeatMapForMatrix(diameterMatrix, 'Œrednica')

@@ -1,7 +1,7 @@
 setwd("D:/PWR/mgr/PracaMagisterska/R")
-pathTime = '/time'
+pathTimes = '/time'
 pathCoins = '/coins'
-pathFull = '/full'
+pathFulls = '/full'
 pathBase = 'data/100000/Sample_'
 pathResult = 'D:/PWR/mgr/PracaMagisterska/R/results/'
 separator = ""
@@ -18,28 +18,29 @@ getCoinsPath <- function(sampleIndex) {
 }
 
 getFullPath <- function(sampleIndex) {
-  path <- getPath(pathFull,sampleIndex)
+  path <- getPath(pathFulls,sampleIndex)
   cat('Start analyse of sample ', path, sep = separator)
   cat('\n')
   return(path)
 }
 
 getTimePath <- function(sampleIndex) {
-  path <- getPath(pathTime,sampleIndex)
+  path <- getPath(pathTimes,sampleIndex)
   cat('Start analyse of sample ', path, sep = separator)
   cat('\n')
   return(path)
 }
 
 getPath <- function(pathSuffix, sampleIndex) {
-  return(paste(pathBase, sampleIndex , pathSuffix, sep = separator))
+  path <- paste(pathBase, sampleIndex , pathSuffix, sep = separator)
+  return(path)
 }
 
 prepareDiagonalMatrix <- function(count) {
   return(matrix(nrow = count, ncol = filecount))
 }
 
-readFilesNames <- function(path, count) {
+readFilesNames <- function(path, count=10) {
   filenames <- list.files(path, pattern="*.csv", all.files = TRUE,
                               full.names = TRUE, recursive = FALSE,
                               ignore.case = TRUE)
@@ -55,8 +56,15 @@ readFilesNames <- function(path, count) {
   return(filenames)
 }
 
-readFile <- function(filename) {
-  return(read.csv2(filename, sep=" ", header = F))  
+readFile <- function(filename, reverseDirection=FALSE) {
+  dfBlockchain <- read.csv2(filename, sep=" ", header = F,  dec = ".", stringsAsFactors=FALSE, as.is=T)
+  if (reverseDirection) {
+    left <- dfBlockchain[,1]
+    right <- dfBlockchain[,2]
+    dfBlockchain[,1] <- right
+    dfBlockchain[,2] <- left
+  }
+  return(dfBlockchain)
 }
 
 readResultFile <- function(filename) {
@@ -139,3 +147,37 @@ removeBottomTicks <- function(heatMap) {
                          axis.ticks.x=element_blank())) 
 }
 
+avg.transaction.value <- function(valueColumn) {
+  numericValues <- as.numeric(valueColumn)
+  avg <- mean(numericValues)
+  avg <- as.numeric(format(round(avg, 2), nsmall = 2))
+  return(avg)
+}
+
+avg.transaction.period <- function(valueColumn) {
+  periods <- vector(length = (length(valueColumn) - 1), mode = 'numeric')
+  i <- 1
+  length <- length(valueColumn)
+  while(i < length) {
+    periods[i] <- abs(valueColumn[i] - valueColumn[i + 1])
+    i <- i + 1
+  }
+  avg <- mean(periods)
+  avg <- as.numeric(format(round(avg, 2), nsmall = 2))
+  return(avg)
+}
+
+blocksCount <- function(matrix) {
+  inputBlockHash <- matrix[,3]
+  outputBlockHash <- matrix[,4]
+  all <- append(inputBlockHash, outputBlockHash)
+  all <- unique(all)  
+  count <- length(all)
+  return(count)
+}
+
+transaction.boundaryDiff <- function(valueColumn) {
+  numericValues <- as.numeric(valueColumn)
+  diff <- abs(valueColumn[1] - valueColumn[length(valueColumn)])
+  return(diff)
+}
