@@ -67,13 +67,15 @@ readFile <- function(filename, reverseDirection=FALSE) {
   return(dfBlockchain)
 }
 
-readResultFile <- function(filename) {
+readResultFile <- function(filename, specifDecimal = TRUE) {
   matrix <- read.csv2(paste(pathResult, filename, sep = separator), dec = ".", 
                       sep=" ", header = F, stringsAsFactors=FALSE, as.is=T)
   rownames(matrix) <- paste('T', 1:10, sep = getSeparator())
   colnames(matrix) <- c("2015-03-31", "2015-06-30","2015-09-30","2015-12-31","2016-03-31","2016-06-30","2016-09-30",'2016-12-31','2017-03-31','2017-06-30')
-  matrix <- as.matrix(matrix)
-  matrix <- specifDecimal(matrix)
+  if(specifDecimal) {
+    matrix <- as.matrix(matrix)
+    matrix <- specifDecimal(matrix)
+  }
   return(matrix)  
 }
 
@@ -100,7 +102,7 @@ number_ticks <- function(n) {function(limits) pretty(limits, n)}
 prepareHeatMapForMatrix <- function(matrix, name) {
   library(reshape2)
   matrixCorr <- melt(matrix, na.rm = FALSE)
-  matrixCorr[,3] <- as.numeric(matrixCorr[,3]) 
+  matrixCorr[,3] <- as.numeric(matrixCorr[,3])
   for (j in 1:length(matrixCorr[,3])) {
     if (is.infinite(matrixCorr[j,3])) matrixCorr[j,3] <- NA
   }
@@ -130,6 +132,8 @@ prepareHeatMapForMatrix <- function(matrix, name) {
   return(heatMap)
 }
 
+
+
 prepareColumnsMeans <- function(matrix) {
   return(colMeans(matrix, na.rm = TRUE))
 }
@@ -154,12 +158,18 @@ avg.transaction.value <- function(valueColumn) {
   return(avg)
 }
 
-avg.transaction.period <- function(valueColumn) {
+avg.transaction.period <- function(times) {
+  valueColumn <- as.numeric(times[,3])
+  valueColumn <- sort(valueColumn, decreasing=TRUE)
   periods <- vector(length = (length(valueColumn) - 1), mode = 'numeric')
   i <- 1
   length <- length(valueColumn)
   while(i < length) {
-    periods[i] <- abs(valueColumn[i] - valueColumn[i + 1])
+    period <- valueColumn[i] - valueColumn[i + 1]
+    if (period < 0) {
+      cat(paste(i, '. Period diffrence less then 0:', times[1,2]))
+    }
+    periods[i] <- abs(period)
     i <- i + 1
   }
   avg <- mean(periods)
@@ -176,8 +186,34 @@ blocksCount <- function(matrix) {
   return(count)
 }
 
-transaction.boundaryDiff <- function(valueColumn) {
-  numericValues <- as.numeric(valueColumn)
-  diff <- abs(valueColumn[1] - valueColumn[length(valueColumn)])
+transaction.boundaryDiff <- function(times) {
+  valueColumn <- as.numeric(times[,3])
+  diff <- valueColumn[1] - valueColumn[length(valueColumn)]
+  if (diff < 0) {
+    cat(paste('Boundary diffrence less then 0: ', times[1,2]))
+  }
+  diff <- abs(diff)
   return(diff)
 }
+
+toHumanTime <- function(data, SHORT= TRUE) {
+  library(lubridate)
+  result <- matrix(nrow = nrow(data), ncol = ncol(data))
+    for(i in 1:ncol(data)){
+      for(j in 1:nrow(data)) {
+        td <- seconds_to_period(data[j,i])
+        if (SHORT) {
+          result[j,i] <- sprintf('%02d:%02.2fs', minute(td), second(td))
+        } else {
+          result[j,i] <- sprintf('%02d %02d:%02d:%02.2f', day(td), td@hour, minute(td), second(td))
+        }
+      }
+    }
+  return(result)
+}
+
+
+
+
+
+

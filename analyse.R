@@ -3,6 +3,7 @@ setwd("D:/PWR/mgr/PracaMagisterska/R")
 library(igraph)
 library(gtools)
 source('functions.R')
+options(nwarnings = 10000)  
 
 filecount <- 10
 sampleCount <- 10
@@ -34,11 +35,11 @@ while (sampleIndex < sampleCount + 1) {
   # prepare index for reverse order
   tableIndex = sampleCount - sampleIndex + 1
   # for each filenames in reverse order for sample
-  for(i in 1:length(filenamesCoin)){
+  for(i in 1:length(filenamesTime)){
     # read file
     fileCoins <- readFile(filenamesCoin[i], TRUE)
-    fileTime <- readFile(filenamesTime[i])
-    fileFull <- readFile(filenamesFull[i])
+    fileTime <- readFile(filenamesTime[i], TRUE)
+    fileFull <- readFile(filenamesFull[i], TRUE)
     #prepare Graph
     cat('Analyse of file ',  filenamesCoin[i], sep=getSeparator())
     cat('\n')
@@ -63,9 +64,9 @@ while (sampleIndex < sampleCount + 1) {
     cat('Analyse of file ',  filenamesTime[i], sep=getSeparator())
     cat('\n')
     #average transaction period
-    avgTransactionPeriod[tableIndex, i] <- avg.transaction.period(fileTime[,3])
+    avgTransactionPeriod[tableIndex, i] <- avg.transaction.period(fileTime)
     # difference between boundaries transactions
-    boundaryDiff[tableIndex, i] <- transaction.boundaryDiff(fileTime[,3])
+    boundaryDiff[tableIndex, i] <- transaction.boundaryDiff(fileTime)
 
     cat('Analyse of file ',  filenamesFull[i], sep=getSeparator())
     cat('\n')
@@ -98,13 +99,12 @@ countOfBlocks <- t(countOfBlocks)
 boundaryDiff <- t(boundaryDiff)
 
 #saveToFile
-writeToFile('filenames.csv', filenamesMatrix)
-writeToFile('diameter.csv', diameterMatrix)
-writeToFile('avgPathLength.csv', avgPathLengthMatrix)
-writeToFile('avgDegree.csv', avgDegreeMatrix)
-writeToFile('avgBetweeness.csv', avgBetweenessMatrix)
-writeToFile('avgTransactionValue.csv', avgTransactionValue)
-writeToFile('avgTransactionPeriod.csv', avgTransactionPeriod)
-writeToFile('boundaryDiff.csv', boundaryDiff)
-writeToFile('countOfBlocks.csv', countOfBlocks)
+# writeToFile('filenames.csv', filenamesMatrix)
+# writeToFile('avgPathLength.csv', avgPathLengthMatrix)
+# writeToFile('avgDegree.csv', avgDegreeMatrix)
+# writeToFile('avgBetweeness.csv', avgBetweenessMatrix)
+# writeToFile('avgTransactionValue.csv', avgTransactionValue)
+# writeToFile('avgTransactionPeriod.csv', avgTransactionPeriod)
+# writeToFile('boundaryDiff.csv', boundaryDiff)
+# writeToFile('countOfBlocks.csv', counCOfBlocks)
 
