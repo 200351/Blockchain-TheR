@@ -99,7 +99,7 @@ writeToFile <- function(filename, toWrite) {
 
 number_ticks <- function(n) {function(limits) pretty(limits, n)}
 
-prepareHeatMapForMatrix <- function(matrix, name) {
+prepareHeatMapForMatrix <- function(matrix, name, numsize = 3) {
   library(reshape2)
   matrixCorr <- melt(matrix, na.rm = FALSE)
   matrixCorr[,3] <- as.numeric(matrixCorr[,3])
@@ -121,7 +121,7 @@ prepareHeatMapForMatrix <- function(matrix, name) {
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
                                      size = 10, hjust = 1)) +
     coord_fixed() + 
-    geom_text(aes(Var2, Var1, label = value), color = "black", size = 2.5) +
+    geom_text(aes(Var2, Var1, label = value), color = "black", size = numsize) +
     theme(
       axis.title.x = element_blank(),
       axis.title.y =  element_blank(),
@@ -212,8 +212,77 @@ toHumanTime <- function(data, SHORT= TRUE) {
   return(result)
 }
 
+plotWithStandardDeviation <- function(matrix, label = "VALUE", title = "TITLE") {
+  library(reshape2)
+  library(ggplot2)
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  matrixCorr <- melt(matrix, na.rm = FALSE)
+  tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
+  ggToPlot = ggplot(tgc, aes(x=Var2, y=value, colour = 1, group = 1)) + 
+    geom_errorbar(aes(ymin=value-sd, ymax=value+sd), colour="black", width=.1, position=pd) +
+    geom_line(position=pd) +
+    geom_point(position=pd, size=3, shape=21, fill="white") + #is filled circle
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
+                                     size = 10, hjust = 1))+  
+    xlab("Czas") +
+    ylab(label) +
+    theme(legend.position="none")
+  return(ggToPlot)
+}
 
+plotWithStandardError <- function(matrix, label = "VALUE", title = "TITLE") {
+  library(reshape2)
+  library(ggplot2)
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  matrixCorr <- melt(matrix, na.rm = FALSE)
+  tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
+  ggToPlot = ggplot(tgc, aes(x=Var2, y=value, colour = 1, group = 1)) + 
+    geom_errorbar(aes(ymin=value-se, ymax=value+se), colour="black", width=.1, position=pd) +
+    geom_line(position=pd) +
+    geom_point(position=pd, size=3, shape=21, fill="white") + #is filled circle
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
+                                     size = 10, hjust = 1))+  
+    xlab("Czas") +
+    ylab(label) +
+    theme(legend.position="none")
+  return(ggToPlot)
+}
 
+saveHeatMap <- function(plot, name) {
+  savePlot(plot, dpi = 600, paste(name, "_hm", sep = ""))
+}
 
+saveAvgHeatMap <- function(plot, name) {
+  savePlot(plot, dpi = 600, paste(name, "_avg_hm", sep = ""))
+}
+
+savePlotSD <- function(plot, name) {
+  savePlot(plot, paste(name, "_sd", sep = ""), height = 120)
+}
+savePlotSE <- function(plot, name) {
+  savePlot(plot, paste(name, "_se", sep = ""), height = 120)
+}
+
+savePlot <- function(plot, name = "name", dpi=1200, width = 180, height = 180) {
+  ggsave(plot = plot, filename = paste("D:/PWR/mgr/PracaMagisterska/R/charts/", name, ".png", sep = ""), 
+         dpi = dpi, width = width, height = height, units = "mm", limitsize = FALSE)
+  
+}
+
+plotHistogram <- function(matrix) {
+  library(reshape2)
+  library(ggplot2)
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  ggplot(data=chol, aes(chol$AGE)) + 
+    geom_histogram(aes(y =..density..), 
+                   breaks=seq(20, 50, by = 2), 
+                   col="red", 
+                   fill="green", 
+                   alpha=.2) + 
+    geom_density(col=2) + 
+    labs(title=..................., x=....., y=.......)
+}
 
 

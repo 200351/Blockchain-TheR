@@ -17,71 +17,100 @@ transactionTimeBoundaryDiffMatrix <- readResultFile('boundaryDiff.csv')
 countOfBlocksMatrix <- readResultFile('countOfBlocks.csv')
 
 
-diameterMatrix
 diameterHeatMap <- prepareHeatMapForMatrix(diameterMatrix, 'Œrednica')
-diameterHeatMap
+saveHeatMap(diameterHeatMap, name = 'srednica')
 diameterAvgForSample <- prepareColumnsMeans(diameterMatrix)
 diameterAvgForSampleHeatMap <- prepareHeatMapForMatrix(diameterAvgForSample, 'Œrednica\nŒrednia dla okresu')
 diameterAvgForSampleHeatMap <- removeBottomTicks(diameterAvgForSampleHeatMap)
-diameterAvgForSampleHeatMap
+saveAvgHeatMap(diameterAvgForSampleHeatMap, name = 'srednica')
+psd <- plotWithStandardDeviation(diameterMatrix, label = "Œrednica")
+savePlotSD(psd, 'srednica')
+pse <- plotWithStandardError(diameterMatrix, label = "Œrednica")
+savePlotSE(pse, 'srednica')
 
-avgPathLengthMatrix
 avgPathLengthHeatMap <- prepareHeatMapForMatrix(avgPathLengthMatrix, 'Œrednia d³ugoœæ scie¿ki')
-avgPathLengthHeatMap
+saveHeatMap(avgPathLengthHeatMap, 'srednia_dlugosc_sciezki')
 avgPathLengthAvgForSample <- prepareColumnsMeans(avgPathLengthMatrix)
 avgPathLengthAvgForSampleHeatMap <- prepareHeatMapForMatrix(avgPathLengthAvgForSample, 'Œrednia d³ugoœæ scie¿ki\nŒrednia dla okresu')
 avgPathLengthAvgForSampleHeatMap <- removeBottomTicks(avgPathLengthAvgForSampleHeatMap)
-avgPathLengthAvgForSampleHeatMap
+saveAvgHeatMap(avgPathLengthAvgForSampleHeatMap, 'srednia_dlugosc_sciezki')
+psd <- plotWithStandartDeviation(avgPathLengthMatrix, label = "Œrednia d³ugoœæ scie¿ki")
+savePlotSD(psd, 'srednia_dlugosc_sciezki')
+pse <- plotWithStandardError(avgPathLengthMatrix, label = "Œrednia d³ugoœæ scie¿ki")
+savePlotSE(pse, 'srednia_dlugosc_sciezki')
 
-avgBetweenessMatrix
 avgBetweenessHeatMap = prepareHeatMapForMatrix(avgBetweenessMatrix, 'Œrednia centralnoœæ')
-avgBetweenessHeatMap
+saveHeatMap(avgBetweenessHeatMap, 'srednia_centralnosc')
 avgBetweenessAvgForSample <- prepareColumnsMeans(avgBetweenessMatrix)
 avgBetweenessAvgForSampleHeatMap <- prepareHeatMapForMatrix(avgBetweenessAvgForSample,'Œrednia centralnoœæ\nŒrednia dla okresu')
 avgBetweenessAvgForSampleHeatMap <- removeBottomTicks(avgBetweenessAvgForSampleHeatMap)
-avgBetweenessAvgForSampleHeatMap
+saveAvgHeatMap(avgBetweenessAvgForSampleHeatMap, 'srednia_centralnosc')
+psd <- plotWithStandartDeviation(avgBetweenessMatrix, label = "Œrednia centralnoœæ")
+savePlotSD(psd, 'srednia_centralnosc')
+pse <- plotWithStandardError(avgBetweenessMatrix, label = "Œrednia centralnoœæ")
+savePlotSE(pse, 'srednia_centralnosc')
+hist(avgBetweenessMatrix)
+hist(avgBetweenessAvgForSample)
 
-avgDegreeMatrix
-avgDegreeMap = prepareHeatMapForMatrix(avgDegreeMatrix, 'Œredni stopieñ wêz³a')
-avgDegreeMap
+avgDegreeMap = prepareHeatMapForMatrix(avgDegreeMatrix, 'Œredni stopieñ wêz³a',numsize = 2.5)
+saveHeatMap(avgDegreeMap, 'sredni_stopien_wezla')
 avgDegreeAvgForSample <- prepareColumnsMeans(avgDegreeMatrix)
-avgDegreeAvgForSampleHeatMap <- prepareHeatMapForMatrix(avgDegreeAvgForSample,'Œredni stopieñ wêz³a\nŒrednia dla okresu')
+avgDegreeAvgForSampleHeatMap <- prepareHeatMapForMatrix(avgDegreeAvgForSample,'Œredni stopieñ wêz³a\nŒrednia dla okresu', numsize = 2.5)
 avgDegreeAvgForSampleHeatMap <- removeBottomTicks(avgDegreeAvgForSampleHeatMap)
-avgDegreeAvgForSampleHeatMap
+saveAvgHeatMap(avgDegreeAvgForSampleHeatMap, 'sredni_stopien_wezla')
+psd <- plotWithStandartDeviation(avgDegreeMatrix, label = 'Œredni stopieñ wêz³a')
+savePlotSD(psd, 'sredni_stopien_wezla')
+pse <- plotWithStandardError(avgDegreeMatrix, label = 'Œredni stopieñ wêz³a')
+savePlotSE(pse, 'sredni_stopien_wezla')
+hist(avgDegreeMatrix)
+hist(avgDegreeAvgForSample)
 
-avgTransactionValueMatrix  
-avgTransactionValueHeatMap <- prepareHeatMapForMatrix(avgTransactionValueMatrix  , 'Œrednia wartoœæ transakcji')
-avgTransactionValueHeatMap 
+
+avgTransactionValueHeatMap <- prepareHeatMapForMatrix(avgTransactionValueMatrix  , 'Œrednia wartoœæ\ntransakcji')
+saveHeatMap(avgTransactionValueHeatMap, 'wartosc_transakcji')
 avgTransactionValueForSample <- prepareColumnsMeans(avgTransactionValueMatrix )
 avgTransactionValueForSampleHeatMap <- prepareHeatMapForMatrix(avgTransactionValueForSample, 'Œrednia wartoœæ transakcji\nŒrednia dla okresu')
 avgTransactionValueForSampleHeatMap <- removeBottomTicks(avgTransactionValueForSampleHeatMap )
-avgTransactionValueForSampleHeatMap
+saveAvgHeatMap(avgTransactionValueForSampleHeatMap, 'wartosc_transakcji')
+psd <- plotWithStandardDeviation(avgTransactionValueMatrix, label = 'Œrednia wartoœæ transakcji')
+savePlotSD(psd, 'wartosc_transakcji')
+pse <- plotWithStandardError(avgTransactionValueMatrix, label = 'Œrednia wartoœæ transakcji')
+savePlotSE(pse, 'wartosc_transakcji')
 
 
-avgTransactionPeriodMatrix
-avgTransactionPeriodHeatMap <- prepareHeatMapForMatrix(avgTransactionPeriodMatrix, 'Œrednia czas pomiêdzy\nrelacjami transakcji')
-avgTransactionPeriodHeatMap 
+avgTransactionPeriodHeatMap <- prepareHeatMapForMatrix(avgTransactionPeriodMatrix, 'Œredni czas ró¿nic\nkolejnych transakcji')
+saveHeatMap(avgTransactionPeriodHeatMap, 'roznica_czasow') 
 avgTransactionPeriodForSample <- prepareColumnsMeans(avgTransactionPeriodMatrix)
-avgTransactionPeriodForSampleHeatMap <- prepareHeatMapForMatrix(avgTransactionPeriodForSample, 'Œrednia czas pomiêdzy\nrelacjami transakcji\nŒrednia dla okresu')
+avgTransactionPeriodForSampleHeatMap <- prepareHeatMapForMatrix(avgTransactionPeriodForSample, 'Œredni czas ró¿nic kolejnych transakcji\nŒrednia dla okresu')
 avgTransactionPeriodForSampleHeatMap <- removeBottomTicks(avgTransactionPeriodForSampleHeatMap)
-avgTransactionPeriodForSampleHeatMap 
+saveAvgHeatMap(avgTransactionPeriodForSampleHeatMap, 'roznica_czasow') 
+psd <- plotWithStandardDeviation(avgTransactionPeriodMatrix, label = 'Œredni czas ró¿nic kolejnych transakcji')
+savePlotSD(psd, 'roznica_czasow')
+pse <- plotWithStandardError(avgTransactionPeriodMatrix, label = 'Œredni czas ró¿nic kolejnych transakcji')
+savePlotSE(pse, 'roznica_czasow')
 
 
-transactionTimeBoundaryDiffMatrix 
-transactionTimeBoundaryDiffHeatMap <- prepareHeatMapForMatrix(transactionTimeBoundaryDiffMatrix , 'Œrednia czas pomiêdzy relacjami transakcji')
-transactionTimeBoundaryDiffHeatMap  
+ 
+transactionTimeBoundaryDiffHeatMap <- prepareHeatMapForMatrix(transactionTimeBoundaryDiffMatrix , 'Czas ró¿nic\ngranicznych transakcji', numsize = 2.5)
+saveHeatMap(transactionTimeBoundaryDiffHeatMap, 'czas_graniczny')
 transactionTimeBoundaryDiffForSample <- prepareColumnsMeans(transactionTimeBoundaryDiffMatrix)
-transactionTimeBoundaryDiffForSampleHeatMap <- prepareHeatMapForMatrix(transactionTimeBoundaryDiffForSample, 'Œrednia czas pomiêdzy relacjami transakcji\nŒrednia dla okresu')
+transactionTimeBoundaryDiffForSampleHeatMap <- prepareHeatMapForMatrix(transactionTimeBoundaryDiffForSample, 'Œredni czas ró¿nic\ngranicznych transakcji dla okresu', numsize = 2.5)
 transactionTimeBoundaryDiffForSampleHeatMap  <- removeBottomTicks(transactionTimeBoundaryDiffForSampleHeatMap )
-transactionTimeBoundaryDiffForSampleHeatMap
-toHumanTime(transactionTimeBoundaryDiffMatrix, FALSE)
+saveAvgHeatMap(transactionTimeBoundaryDiffForSampleHeatMap, 'czas_graniczny')
+psd <- plotWithStandardDeviation(transactionTimeBoundaryDiffMatrix, label = 'Œredni czas ró¿nic granicznych transakcji')
+savePlotSD(psd, 'czas_graniczny')
+pse <- plotWithStandardError(transactionTimeBoundaryDiffMatrix, label = 'Œredni czas ró¿nic granicznych transakcji')
+savePlotSE(pse, 'czas_graniczny')
 
 
 
-countOfBlocksMatrix
-countOfBlocksHeatMap <- prepareHeatMapForMatrix(countOfBlocksMatrix, 'Œrednia iloœæ bloków\npotrzebnych do\nodnalezienia\n100000 po³¹czeñ')
-countOfBlocksHeatMap 
+countOfBlocksHeatMap <- prepareHeatMapForMatrix(countOfBlocksMatrix, 'Iloœæ bloków\npotrzebnych do\nodnalezienia\n100000 po³¹czeñ')
+saveHeatMap(countOfBlocksHeatMap, 'ilosc_blokow') 
 countOfBlocksForSample <- prepareColumnsMeans(countOfBlocksMatrix)
-countOfBlocksForSampleHeatMap <- prepareHeatMapForMatrix(countOfBlocksForSample , 'Œrednia iloœæ bloków\npotrzebnych do\nodnalezienia\n100000 po³¹czeñ\nŒrednia dla okresu')
+countOfBlocksForSampleHeatMap <- prepareHeatMapForMatrix(countOfBlocksForSample , 'Œrednia iloœæ bloków\npotrzebnych do\nodnalezienia\n100000 po³¹czeñ\n dla okresu')
 countOfBlocksForSampleHeatMap <- removeBottomTicks(countOfBlocksForSampleHeatMap)
-countOfBlocksForSampleHeatMap 
+saveAvgHeatMap(countOfBlocksForSampleHeatMap, 'ilosc_blokow')  
+psd <- plotWithStandardDeviation(countOfBlocksMatrix, label = 'Œrednia iloœæ bloków potrzebnych do odnalezienia 100000 po³¹czeñ')
+savePlotSD(psd, 'ilosc_blokow')
+pse <- plotWithStandardError(countOfBlocksMatrix, label = 'Œrednia iloœæ bloków potrzebnych do odnalezienia 100000 po³¹czeñ')
+savePlotSE(pse, 'ilosc_blokow')
