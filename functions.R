@@ -215,6 +215,7 @@ toHumanTime <- function(data, SHORT= TRUE) {
 plotWithStandardDeviation <- function(matrix, label = "VALUE", title = "TITLE") {
   library(reshape2)
   library(ggplot2)
+  library(Rmisc)
   pd <- position_dodge(0.1) # move them .05 to the left and right
   matrixCorr <- melt(matrix, na.rm = FALSE)
   tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
@@ -231,9 +232,31 @@ plotWithStandardDeviation <- function(matrix, label = "VALUE", title = "TITLE") 
   return(ggToPlot)
 }
 
+plotApproxStandardDeviation <- function(matrix, label = "VALUE", title = "TITLE") {
+  library(reshape2)
+  library(ggplot2)
+  library(Rmisc)
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  matrixCorr <- melt(matrix, na.rm = FALSE)
+  tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
+  ggToPlot = ggplot(tgc, aes(x=Var2, y=value, colour = 1, group = 1)) + 
+    geom_errorbar(aes(ymin=value-sd, ymax=value+sd), colour="black", width=.1, position=pd) +
+    stat_summary(fun.data=mean_cl_normal) + 
+    geom_smooth(method='lm',formula=y~x, se = FALSE) +
+    geom_point(position=pd, size=3, shape=21, fill="white") + #is filled circle
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
+                                     size = 10, hjust = 1))+  
+    xlab("Czas") +
+    ylab(label) +
+    theme(legend.position="none")
+  return(ggToPlot)
+}
+
 plotWithStandardError <- function(matrix, label = "VALUE", title = "TITLE") {
   library(reshape2)
   library(ggplot2)
+  library(Rmisc)
   pd <- position_dodge(0.1) # move them .05 to the left and right
   matrixCorr <- melt(matrix, na.rm = FALSE)
   tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
@@ -250,19 +273,66 @@ plotWithStandardError <- function(matrix, label = "VALUE", title = "TITLE") {
   return(ggToPlot)
 }
 
+plotApproxStandardError <- function(matrix, label = "VALUE", title = "TITLE") {
+  library(reshape2)
+  library(ggplot2)
+  library(Rmisc)
+  library(Hmisc)
+  
+  pd <- position_dodge(0.1) # move them .05 to the left and right
+  matrixCorr <- melt(matrix, na.rm = FALSE)
+  tgc <- summarySE(matrixCorr, measurevar="value", groupvars=c("Var2"))
+  ggToPlot = ggplot(tgc, aes(x=Var2, y=value, colour = 1, group = 1)) + 
+    geom_errorbar(aes(ymin=value-se, ymax=value+se), colour="black", width=.1, position=pd) +
+    stat_summary(fun.data=mean_cl_normal) + 
+    geom_smooth(method='lm',formula=y~x, se = FALSE) +
+    geom_point(position=pd, size=3, shape=21, fill="white") + #is filled circle
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
+                                     size = 10, hjust = 1))+  
+    xlab("Czas") +
+    ylab(label) +
+    theme(legend.position="none")
+  return(ggToPlot)
+}
+
+makeDir <- function(name) {
+  directory <- paste('D:/PWR/mgr/PracaMagisterska/R/charts/', name, sep = "")
+  if (dir.exists(directory) == FALSE) {
+    dir.create(directory)
+  }
+}
+
 saveHeatMap <- function(plot, name) {
-  savePlot(plot, dpi = 600, paste(name, "_hm", sep = ""))
+  makeDir(name)
+  savePlot(plot, dpi = 600, paste(name , '/', name, "_hm", sep = ""), height = 150)
 }
 
 saveAvgHeatMap <- function(plot, name) {
-  savePlot(plot, dpi = 600, paste(name, "_avg_hm", sep = ""))
+  makeDir(name)
+  savePlot(plot, dpi = 600,  paste(name , '/', name,"_avg_hm", sep = ""))
 }
 
 savePlotSD <- function(plot, name) {
-  savePlot(plot, paste(name, "_sd", sep = ""), height = 120)
+  makeDir(name)
+  savePlot(plot,  paste(name , '/', name, "_sd", sep = ""), height = 110)
 }
 savePlotSE <- function(plot, name) {
-  savePlot(plot, paste(name, "_se", sep = ""), height = 120)
+  makeDir(name)
+  savePlot(plot,  paste(name , '/', name,"_se", sep = ""), height = 110)
+}
+
+savePlotSDA <- function(plot, name) {
+  makeDir(name)
+  savePlot(plot,  paste(name , '/', name, "_sda", sep = ""), height = 110)
+}
+savePlotSEA <- function(plot, name) {
+  makeDir(name)
+  savePlot(plot,  paste(name , '/', name, "_sea", sep = ""), height = 110)
+}
+saveHistogram <- function(plot, name) {
+  makeDir(name)
+  savePlot(plot,  paste(name , '/', name, "_hist", sep = ""), height = 45)
 }
 
 savePlot <- function(plot, name = "name", dpi=1200, width = 180, height = 180) {
@@ -271,18 +341,21 @@ savePlot <- function(plot, name = "name", dpi=1200, width = 180, height = 180) {
   
 }
 
-plotHistogram <- function(matrix) {
+plotHistogram <- function(matrix, xlab =  'Œrednica' , ylab = 'Iloœæ wyst¹pieñ', 
+                          y_ticks = 2, x_ticks = 4, hist_breaks = 1) {
   library(reshape2)
   library(ggplot2)
-  pd <- position_dodge(0.1) # move them .05 to the left and right
-  ggplot(data=chol, aes(chol$AGE)) + 
-    geom_histogram(aes(y =..density..), 
-                   breaks=seq(20, 50, by = 2), 
-                   col="red", 
-                   fill="green", 
-                   alpha=.2) + 
-    geom_density(col=2) + 
-    labs(title=..................., x=....., y=.......)
+  matrixCorr <- melt(matrix, na.rm = FALSE)
+  ggplot(data=matrixCorr, aes(matrixCorr$value)) + 
+    geom_histogram(breaks=seq(0, max(matrix), by = hist_breaks), 
+                   col="black", 
+                   fill="grey") + 
+   # coord_fixed() + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, 
+                                     size = 10, hjust = 1)) + 
+    labs(x=xlab, y=ylab)+
+    scale_x_continuous(limits = c(0,(max(matrix))), breaks =  seq(0,max(matrix), x_ticks)) +
+    scale_y_continuous(breaks =  seq(0,100000,y_ticks))
 }
 
 
